@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "MemberProfile": {
+      "title": "MemberProfile",
+      "description": "Profil musik mahasiswa SPI 1A beserta lagu pilihan dan pesan personal",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Authentication User ID pemilik profil",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Nama lengkap mahasiswa SPI 1A",
+          "maxLength": 100,
+          "minLength": 2
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL foto profil dari Firebase Storage atau avatar default",
+          "maxLength": 2048
+        },
+        "songId": {
+          "type": "string",
+          "description": "ID unik lagu dari iTunes / music provider",
+          "maxLength": 128
+        },
+        "songTitle": {
+          "type": "string",
+          "description": "Judul lagu pilihan",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "artistName": {
+          "type": "string",
+          "description": "Nama penyanyi atau band",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "albumArtwork": {
+          "type": "string",
+          "description": "URL artwork cover album",
+          "maxLength": 2048
+        },
+        "previewUrl": {
+          "type": "string",
+          "description": "URL audio preview 30 detik (MP4/AAC/MP3)",
+          "maxLength": 2048
+        },
+        "fullAudioUrl": {
+          "type": "string",
+          "description": "URL streaming musik versi penuh (Full length audio)",
+          "maxLength": 2048
+        },
+        "youtubeId": {
+          "type": "string",
+          "description": "ID video YouTube untuk pemutaran video musik dan audio full length",
+          "maxLength": 128
+        },
+        "isFullTrack": {
+          "type": "boolean",
+          "description": "Menandakan apakah audio merupakan lagu versi penuh"
+        },
+        "trackUrl": {
+          "type": "string",
+          "description": "URL halaman web resmi lagu di Apple Music / iTunes",
+          "maxLength": 2048
+        },
+        "durationMs": {
+          "type": "number",
+          "description": "Durasi audio dalam milidetik (misal 30000 atau durasi penuh)"
+        },
+        "personalMessage": {
+          "type": "string",
+          "description": "Pesan singkat atau alasan memilih lagu ini bagi kelas SPI 1A",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu pembuatan profil (ISO string atau timestamp)"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu pembaruan profil terakhir"
+        }
+      },
+      "required": ["uid", "displayName", "songTitle", "artistName"]
+    },
+    "ClassMember": {
+      "title": "ClassMember",
+      "description": "Daftar referensi mahasiswa kelas SPI 1A UIN Raden Mas Said",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "User ID jika sudah ditautkan dengan akun login",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Nama lengkap mahasiswa SPI 1A",
+          "maxLength": 100
+        },
+        "nim": {
+          "type": "string",
+          "description": "Nomor Induk Mahasiswa",
+          "maxLength": 30
+        },
+        "status": {
+          "type": "string",
+          "description": "Status keanggotaan mahasiswa (active/joined)",
+          "enum": ["active", "joined", "invited"]
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu bergabung"
+        }
+      },
+      "required": ["displayName", "status"]
+    }
+  },
+  "firestore": {
+    "/members/{memberId}": {
+      "schema": {
+        "$ref": "#/entities/MemberProfile"
+      },
+      "description": "Koleksi profil musik mahasiswa kelas SPI 1A (publik dibaca, ditulis oleh pemilik akun UID)"
+    },
+    "/classMembers/{memberId}": {
+      "schema": {
+        "$ref": "#/entities/ClassMember"
+      },
+      "description": "Koleksi direktori mahasiswa kelas SPI 1A"
+    }
+  }
+}

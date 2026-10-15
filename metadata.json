@@ -1,0 +1,6 @@
+{
+  "name": "SPI 1A Music Room",
+  "description": "Website playlist kolaboratif mahasiswa Sejarah Peradaban Islam kelas 1A UIN Raden Mas Said Surakarta. One Class, Many Stories, One Playlist.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

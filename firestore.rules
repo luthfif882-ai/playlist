@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function isValidMember(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'songTitle', 'artistName'])
+        && data.uid is string && data.uid.size() > 0 && data.uid.size() <= 128
+        && data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 100
+        && data.songTitle is string && data.songTitle.size() >= 1 && data.songTitle.size() <= 200
+        && data.artistName is string && data.artistName.size() >= 1 && data.artistName.size() <= 200
+        && (!('personalMessage' in data) || (data.personalMessage is string && data.personalMessage.size() <= 500))
+        && (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 2048))
+        && (!('songId' in data) || (data.songId is string && data.songId.size() <= 128))
+        && (!('albumArtwork' in data) || (data.albumArtwork is string && data.albumArtwork.size() <= 2048))
+        && (!('previewUrl' in data) || (data.previewUrl is string && data.previewUrl.size() <= 2048))
+        && (!('fullAudioUrl' in data) || (data.fullAudioUrl is string && data.fullAudioUrl.size() <= 2048))
+        && (!('youtubeId' in data) || (data.youtubeId is string && data.youtubeId.size() <= 128))
+        && (!('isFullTrack' in data) || (data.isFullTrack is bool))
+        && (!('durationMs' in data) || (data.durationMs is number))
+        && (!('trackUrl' in data) || (data.trackUrl is string && data.trackUrl.size() <= 2048))
+        && data.uid == request.auth.uid;
+    }
+
+    // Public read for playlist & directory; secure write strictly limited to the authentic owner
+    match /members/{memberId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && isValidId(memberId)
+                    && request.auth.uid == memberId
+                    && isValidMember(request.resource.data);
+      allow update: if isSignedIn()
+                    && isValidId(memberId)
+                    && request.auth.uid == memberId
+                    && isValidMember(request.resource.data)
+                    && request.resource.data.uid == resource.data.uid;
+      allow delete: if isOwner(memberId);
+    }
+
+    // Class directory members list
+    match /classMembers/{memberId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isValidId(memberId);
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
